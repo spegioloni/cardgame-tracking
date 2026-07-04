@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kartenspiel Tracker 🃏</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <style>
+        :root {
+            --primary: #ff4757;
+            --secondary: #2ed573;
+            --bg-gradient: linear-gradient(135deg, #70a1ff 0%, #5352ed 100%);
+            --glass-bg: rgba(255, 255, 255, 0.15);
+            --glass-border: rgba(255, 255, 255, 0.3);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Fredoka', sans-serif;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        h1, h2 {
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            margin-bottom: 20px;
+        }
+
+        .container {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 30px;
+            width: 100%;
+            max-width: 600px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            animation: popIn 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            margin-bottom: 20px;
+        }
+
+        /* Mikro-Animationen & Keyframes */
+        @keyframes popIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes slideIn {
+            0% { transform: translateY(20px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+
+        /* Inputs & Buttons */
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            outline: none;
+            background: rgba(255, 255, 255, 0.9);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        input:focus {
+            transform: scale(1.02);
+            box-shadow: 0 0 15px rgba(255, 71, 87, 0.6);
+        }
+
+        button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 71, 87, 0.4);
+        }
+
+        button:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 25px rgba(255, 71, 87, 0.6);
+        }
+
+        button:active {
+            transform: translateY(1px) scale(0.95);
+        }
+
+        button.secondary {
+            background: var(--secondary);
+            box-shadow: 0 4px 15px rgba(46, 213, 115, 0.4);
+        }
+
+        button.secondary:hover {
+            box-shadow: 0 8px 25px rgba(46, 213, 115, 0.6);
+        }
+
+        /* Listen & Tabellen */
+        .player-list {
+            list-style: none;
+            margin: 15px 0;
+        }
+
+        .player-list li {
+            background: rgba(0, 0, 0, 0.2);
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 10px;
+            animation: slideIn 0.3s ease forwards;
+        }
+
+        .round-inputs {
+            display: grid;
+            grid-template-columns: 1fr 100px;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 10px;
+            background: rgba(0,0,0,0.1);
+            padding: 10px;
+            border-radius: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: rgba(0,0,0,0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        th { background: rgba(0,0,0,0.2); }
+
+        .hidden { display: none !important; }
+
+        /* Ranking Styling */
+        .rank-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.2);
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+        
+        .rank-item:nth-child(1) { background: linear-gradient(45deg, #ffd700, #fbc531); color: #2f3542; transform: scale(1.05); }
+        .rank-item:nth-child(2) { background: linear-gradient(45deg, #c0c0c0, #718093); }
+        .rank-item:nth-child(3) { background: linear-gradient(45deg, #cd7f32, #e1b12c); }
+    </style>
+</head>
+<body>
+
+    <div id="setup-screen" class="container">
+        <h1>🃏 Spiel Setup</h1>
+        <p>Wer spielt mit?</p>
+        <input type="text" id="player-name" placeholder="Spielername eingeben..." onkeypress="handleEnter(event)">
+        <button onclick="addPlayer()">+ Hinzufügen</button>
+        
+        <ul id="players-ul" class="player-list"></ul>
+        
+        <button class="secondary hidden" id="start-btn" onclick="startGame()">🚀 Spiel starten!</button>
+    </div>
+
+    <div id="game-screen" class="container hidden">
+        <h1 id="round-title">Runde 1</h1>
+        <div id="score-inputs"></div>
+        
+        <button onclick="submitRound()">📝 Punkte eintragen</button>
+        <button class="secondary" style="margin-left: 10px;" onclick="endGame()">🏆 Spiel beenden</button>
+
+        <h3 style="margin-top: 30px;">Punktestand</h3>
+        <div style="overflow-x: auto;">
+            <table id="score-table">
+                <thead id="score-thead"></thead>
+                <tbody id="score-tbody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="ranking-screen" class="container hidden">
+        <h1>🎉 Endergebnis!</h1>
+        <div id="ranking-list"></div>
+        
+        <button onclick="takeScreenshot()">📸 Screenshot speichern</button>
+        <button class="secondary" style="margin-left: 10px;" onclick="location.reload()">🔄 Neues Spiel</button>
+    </div>
+
+    <script>
+        let players = [];
+        let currentRound = 1;
+        let roundHistory = [];
+
+        // --- PHASE 1: Setup ---
+        function handleEnter(e) {
+            if (e.key === 'Enter') addPlayer();
+        }
+
+        function addPlayer() {
+            const input = document.getElementById('player-name');
+            const name = input.value.trim();
+            if (name === '') return;
+
+            players.push({ name: name, total: 0, scores: [] });
+            input.value = '';
+            
+            updatePlayerList();
+            
+            if (players.length >= 2) {
+                document.getElementById('start-btn').classList.remove('hidden');
+            }
+        }
+
+        function updatePlayerList() {
+            const ul = document.getElementById('players-ul');
+            ul.innerHTML = '';
+            players.forEach(p => {
+                const li = document.createElement('li');
+                li.innerText = '👤 ' + p.name;
+                ul.appendChild(li);
+            });
+        }
+
+        function startGame() {
+            document.getElementById('setup-screen').classList.add('hidden');
+            document.getElementById('game-screen').classList.remove('hidden');
+            renderScoreInputs();
+            renderTableHeaders();
+        }
+
+        // --- PHASE 2: Tracking ---
+        function renderScoreInputs() {
+            document.getElementById('round-title').innerText = `Runde ${currentRound}`;
+            const container = document.getElementById('score-inputs');
+            container.innerHTML = '';
+
+            players.forEach((p, index) => {
+                const div = document.createElement('div');
+                div.className = 'round-inputs';
+                div.innerHTML = `
+                    <span>${p.name}</span>
+                    <input type="number" id="score-${index}" placeholder="Punkte" value="0">
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function renderTableHeaders() {
+            const thead = document.getElementById('score-thead');
+            let html = '<tr><th>Runde</th>';
+            players.forEach(p => html += `<th>${p.name}</th>`);
+            html += '</tr>';
+            thead.innerHTML = html;
+        }
+
+        function submitRound() {
+            const tbody = document.getElementById('score-tbody');
+            let tr = document.createElement('tr');
+            tr.innerHTML = `<td>${currentRound}</td>`;
+
+            players.forEach((p, index) => {
+                const scoreInput = document.getElementById(`score-${index}`);
+                const points = parseInt(scoreInput.value) || 0;
+                
+                p.scores.push(points);
+                p.total += points;
+                
+                tr.innerHTML += `<td>${points} <i>(${p.total})</i></td>`;
+            });
+
+            tbody.appendChild(tr);
+            currentRound++;
+            renderScoreInputs();
+            
+            // Kleine Animation fürs Eintragen
+            const table = document.getElementById('score-table');
+            table.style.transform = 'scale(1.02)';
+            setTimeout(() => table.style.transform = 'scale(1)', 200);
+        }
+
+        // --- PHASE 3: Ranking ---
+        function endGame() {
+            document.getElementById('game-screen').classList.add('hidden');
+            const rankingScreen = document.getElementById('ranking-screen');
+            rankingScreen.classList.remove('hidden');
+
+            const rankingList = document.getElementById('ranking-list');
+            rankingList.innerHTML = '';
+
+            // Hier kannst du die Sortierung anpassen. Standard: Höchste Punktzahl gewinnt (Wizard). 
+            // Für Hornochsen müsstest du b.total - a.total zu a.total - b.total ändern.
+            let sortedPlayers = [...players].sort((a, b) => b.total - a.total);
+
+            const medals = ['🥇', '🥈', '🥉'];
+
+            sortedPlayers.forEach((p, index) => {
+                const div = document.createElement('div');
+                div.className = 'rank-item';
+                div.style.animation = `slideIn ${0.3 + (index * 0.1)}s ease forwards`;
+                
+                let rankIcon = index < 3 ? medals[index] : `${index + 1}.`;
+                
+                div.innerHTML = `
+                    <span>${rankIcon} ${p.name}</span>
+                    <span>${p.total} Pkt.</span>
+                `;
+                rankingList.appendChild(div);
+            });
+        }
+
+        // --- SCREENSHOT FEATURE ---
+        function takeScreenshot() {
+            const element = document.getElementById('ranking-screen');
+            // Buttons kurz verstecken für ein sauberes Bild
+            const buttons = element.querySelectorAll('button');
+            buttons.forEach(btn => btn.style.display = 'none');
+
+            html2canvas(element, {
+                backgroundColor: '#5352ed', // Hintergrundfarbe fürs Bild erzwingen
+                scale: 2
+            }).then(canvas => {
+                // Bild herunterladen
+                const link = document.createElement('a');
+                link.download = 'Spiele_Ranking.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+
+                // Buttons wieder einblenden
+                buttons.forEach(btn => btn.style.display = 'inline-block');
+            });
+        }
+    </script>
+</body>
+</html>
