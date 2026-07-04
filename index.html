@@ -30,13 +30,18 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding: 20px;
+            padding: 15px;
             overflow-x: hidden;
         }
 
         h1, h2 {
             text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
             margin-bottom: 20px;
+            font-size: clamp(1.5rem, 5vw, 2.5rem);
+        }
+
+        h3 {
+            font-size: clamp(1rem, 4vw, 1.5rem);
         }
 
         .container {
@@ -45,7 +50,7 @@
             -webkit-backdrop-filter: blur(12px);
             border: 1px solid var(--glass-border);
             border-radius: 20px;
-            padding: 30px;
+            padding: clamp(15px, 5vw, 30px);
             width: 100%;
             max-width: 600px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
@@ -86,9 +91,9 @@
             background: var(--primary);
             color: white;
             border: none;
-            padding: 12px 24px;
+            padding: clamp(10px, 3vw, 12px) clamp(20px, 4vw, 24px);
             border-radius: 50px;
-            font-size: 16px;
+            font-size: clamp(14px, 3vw, 16px);
             font-weight: 600;
             cursor: pointer;
             margin-top: 15px;
@@ -114,6 +119,70 @@
             box-shadow: 0 8px 25px rgba(46, 213, 115, 0.6);
         }
 
+        /* Toggle Switch */
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin: 20px 0;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 15px;
+            border-radius: 10px;
+            flex-wrap: wrap;
+        }
+
+        .toggle-label {
+            font-weight: 600;
+            font-size: clamp(14px, 3vw, 16px);
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-flex;
+            width: 70px;
+            height: 36px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.3);
+            transition: 0.3s;
+            border-radius: 34px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 28px;
+            width: 28px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background-color: var(--secondary);
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(34px);
+        }
+
         /* Listen & Tabellen */
         .player-list {
             list-style: none;
@@ -126,6 +195,7 @@
             padding: 10px;
             border-radius: 10px;
             animation: slideIn 0.3s ease forwards;
+            font-size: clamp(14px, 3vw, 16px);
         }
 
         .round-inputs {
@@ -139,6 +209,14 @@
             border-radius: 10px;
         }
 
+        .round-inputs span {
+            font-size: clamp(14px, 3vw, 16px);
+        }
+
+        .round-inputs input {
+            margin: 0;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
@@ -146,10 +224,11 @@
             background: rgba(0,0,0,0.1);
             border-radius: 10px;
             overflow: hidden;
+            font-size: clamp(12px, 2.5vw, 14px);
         }
 
         th, td {
-            padding: 12px;
+            padding: clamp(8px, 2vw, 12px);
             text-align: center;
             border-bottom: 1px solid rgba(255,255,255,0.1);
         }
@@ -163,29 +242,94 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px;
+            padding: clamp(12px, 3vw, 15px);
             margin: 10px 0;
             border-radius: 10px;
             background: rgba(255,255,255,0.2);
-            font-size: 1.2rem;
+            font-size: clamp(1rem, 4vw, 1.2rem);
             font-weight: bold;
         }
         
         .rank-item:nth-child(1) { background: linear-gradient(45deg, #ffd700, #fbc531); color: #2f3542; transform: scale(1.05); }
         .rank-item:nth-child(2) { background: linear-gradient(45deg, #c0c0c0, #718093); }
         .rank-item:nth-child(3) { background: linear-gradient(45deg, #cd7f32, #e1b12c); }
+
+        /* Button Container für Mobile */
+        .button-container {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            width: 100%;
+            margin-top: 15px;
+        }
+
+        .button-container button {
+            flex: 1;
+            min-width: 140px;
+            margin: 0;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                border-radius: 15px;
+                padding: 15px;
+            }
+
+            button {
+                width: 100%;
+                margin-top: 10px;
+            }
+
+            .button-container button {
+                flex: 1 1 auto;
+            }
+
+            .toggle-container {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .toggle-label {
+                min-width: auto;
+                width: 100%;
+            }
+
+            .round-inputs {
+                grid-template-columns: 1fr 80px;
+                gap: 8px;
+                padding: 8px;
+            }
+
+            table {
+                font-size: 12px;
+            }
+
+            th, td {
+                padding: 8px 4px;
+            }
+        }
     </style>
 </head>
 <body>
 
     <div id="setup-screen" class="container">
         <h1>🃏 Spiel Setup</h1>
-        <p>Wer spielt mit?</p>
+        <p style="font-size: clamp(14px, 3vw, 16px); margin-bottom: 15px;">Wer spielt mit?</p>
         <input type="text" id="player-name" placeholder="Spielername eingeben..." onkeypress="handleEnter(event)">
         <button onclick="addPlayer()">+ Hinzufügen</button>
         
         <ul id="players-ul" class="player-list"></ul>
         
+        <div class="toggle-container" id="scoring-toggle">
+            <label class="toggle-label">Punktwertung:</label>
+            <label class="toggle-switch">
+                <input type="checkbox" id="higher-better" checked onchange="updateScoringMode()">
+                <span class="toggle-slider"></span>
+            </label>
+            <span id="scoring-label" style="font-size: clamp(14px, 3vw, 16px); flex: 0 1 auto;">Höher ist besser</span>
+        </div>
+
         <button class="secondary hidden" id="start-btn" onclick="startGame()">🚀 Spiel starten!</button>
     </div>
 
@@ -193,8 +337,10 @@
         <h1 id="round-title">Runde 1</h1>
         <div id="score-inputs"></div>
         
-        <button onclick="submitRound()">📝 Punkte eintragen</button>
-        <button class="secondary" style="margin-left: 10px;" onclick="endGame()">🏆 Spiel beenden</button>
+        <div class="button-container">
+            <button onclick="submitRound()">📝 Punkte eintragen</button>
+            <button class="secondary" onclick="endGame()">🏆 Spiel beenden</button>
+        </div>
 
         <h3 style="margin-top: 30px;">Punktestand</h3>
         <div style="overflow-x: auto;">
@@ -209,14 +355,42 @@
         <h1>🎉 Endergebnis!</h1>
         <div id="ranking-list"></div>
         
-        <button onclick="takeScreenshot()">📸 Screenshot speichern</button>
-        <button class="secondary" style="margin-left: 10px;" onclick="location.reload()">🔄 Neues Spiel</button>
+        <div class="button-container">
+            <button onclick="takeScreenshot()">📸 Screenshot speichern</button>
+            <button class="secondary" onclick="location.reload()">🔄 Neues Spiel</button>
+        </div>
     </div>
 
     <script>
         let players = [];
         let currentRound = 1;
         let roundHistory = [];
+        let higherIsBetter = true;
+
+        // --- Persistierung von Einstellungen ---
+        function saveScoringMode() {
+            localStorage.setItem('higherIsBetter', higherIsBetter);
+        }
+
+        function loadScoringMode() {
+            const saved = localStorage.getItem('higherIsBetter');
+            if (saved !== null) {
+                higherIsBetter = saved === 'true';
+                document.getElementById('higher-better').checked = higherIsBetter;
+                updateScoringLabel();
+            }
+        }
+
+        function updateScoringMode() {
+            higherIsBetter = document.getElementById('higher-better').checked;
+            updateScoringLabel();
+            saveScoringMode();
+        }
+
+        function updateScoringLabel() {
+            const label = document.getElementById('scoring-label');
+            label.innerText = higherIsBetter ? 'Höher ist besser' : 'Niedriger ist besser';
+        }
 
         // --- PHASE 1: Setup ---
         function handleEnter(e) {
@@ -314,9 +488,13 @@
             const rankingList = document.getElementById('ranking-list');
             rankingList.innerHTML = '';
 
-            // Hier kannst du die Sortierung anpassen. Standard: Höchste Punktzahl gewinnt (Wizard). 
-            // Für Hornochsen müsstest du b.total - a.total zu a.total - b.total ändern.
-            let sortedPlayers = [...players].sort((a, b) => b.total - a.total);
+            // Sortierung basierend auf Einstellung
+            let sortedPlayers;
+            if (higherIsBetter) {
+                sortedPlayers = [...players].sort((a, b) => b.total - a.total);
+            } else {
+                sortedPlayers = [...players].sort((a, b) => a.total - b.total);
+            }
 
             const medals = ['🥇', '🥈', '🥉'];
 
@@ -356,7 +534,9 @@
                 buttons.forEach(btn => btn.style.display = 'inline-block');
             });
         }
+
+        // --- Beim Laden Einstellungen laden ---
+        window.addEventListener('DOMContentLoaded', loadScoringMode);
     </script>
 </body>
 </html>
-
